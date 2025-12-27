@@ -1,5 +1,5 @@
 import { Appointment } from "../models/Appointment.model.js";
-import { User } from "../models/User.model.js";
+import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { APPOINTMENT_STATUS, ROLES } from "../config/constants";
 

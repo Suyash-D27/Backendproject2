@@ -80,4 +80,5 @@ export const finalizeHealthRecord = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(200, record, "Health record finalized")
     );
-};
+});
+
