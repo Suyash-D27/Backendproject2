@@ -3,11 +3,11 @@
 import User from "../models/user.model.js";
 import Doctor from "../models/doctor.model.js";
 import Patient from "../models/patient.model.js";
-import Hospital from "../models/Hospital.js";
+//import Hospital from "../models/hospital.model.js";
 
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { ROLES } from "../config/role.js";
+import { ROLES } from "../config/constants/roles.js";
 
 class AuthService {
 

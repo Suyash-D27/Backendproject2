@@ -1,11 +1,10 @@
-import { HealthRecord } from "../models/HealthRecord.model.js";
-import { Appointment } from "../models/Appointment.model.js";
-import { ApiError } from "../utils/ApiError.js";
-import {
-  APPOINTMENT_STATUS,
-  HEALTH_RECORD_STATUS,
-  ROLES,
-} from "../config/constants";
+import  HealthRecord  from "../models/HealthRecord.model.js";
+import  Appointment  from "../models/Appointment.model.js";
+import  ApiError  from "../utils/ApiError.js";
+import {ROLES
+} from "../config/constants/roles.js";
+import {APPOINTMENT_STATUS} from "../config/constants/appointmentStatus.js";
+import {HEALTH_RECORD_STATUS} from "../config/constants/healthRecordStatus.js"; 
 
 class HealthRecordService {
 

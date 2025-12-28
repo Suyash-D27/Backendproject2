@@ -1,10 +1,10 @@
-import { ApiError } from "../utils/ApiError.js";
+import  ApiError  from "../utils/ApiError.js";
 
 /**
  * Generic hospital scope middleware
  * @param {Function} getResourceHospitalId - function that returns hospitalId from request
  */
-export const hospitalScope = (getResourceHospitalId) => {
+ const hospitalScope = (getResourceHospitalId) => {
   return (req, res, next) => {
     if (!req.user || !req.user.hospitalId) {
       throw new ApiError(401, "Authentication required");
@@ -23,3 +23,5 @@ export const hospitalScope = (getResourceHospitalId) => {
     next();
   };
 };
+
+export default hospitalScope;

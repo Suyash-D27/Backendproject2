@@ -1,11 +1,11 @@
-import { Test } from "../models/Test.model.js";
-import { HealthRecord } from "../models/HealthRecord.model.js";
-import { ApiError } from "../utils/ApiError.js";
+import  Test  from "../models/Test.model.js";
+import  HealthRecord from "../models/HealthRecord.model.js";
+import  ApiError from "../utils/ApiError.js";
 import {
-  TEST_STATUS,
-  HEALTH_RECORD_STATUS,
   ROLES,
-} from "../config/constants";
+} from "../config/constants/roles.js";
+import{ TEST_STATUS } from "../config/constants/testStatus.js";
+import { HEALTH_RECORD_STATUS } from "../config/constants/healthRecordStatus.js";
 
 class TestService {
 

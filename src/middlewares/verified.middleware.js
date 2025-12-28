@@ -1,6 +1,6 @@
-import { ApiError } from "../utils/ApiError.js";
+import  ApiError  from "../utils/ApiError.js";
 
-export const requireVerifiedUser = (req, res, next) => {
+ const requireVerifiedUser = (req, res, next) => {
   // authMiddleware must run before this
   if (!req.user) {
     throw new ApiError(401, "Authentication required");
@@ -12,3 +12,5 @@ export const requireVerifiedUser = (req, res, next) => {
 
   next();
 };
+
+export default requireVerifiedUser;

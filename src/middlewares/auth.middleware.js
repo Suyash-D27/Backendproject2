@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
-import { ApiError } from "../utils/ApiError.js";
-import { User } from "../models/user.model.js";
+import  ApiError  from "../utils/ApiError.js";
+import  User  from "../models/user.model.js";
 
-export const authMiddleware = async (req, _, next) => {
+  const authMiddleware = async (req, _, next) => {
   const token =
     req.cookies?.accessToken ||
     req.header("Authorization")?.replace("Bearer ", "");
@@ -35,3 +35,5 @@ export const authMiddleware = async (req, _, next) => {
 
   next();
 };
+
+export default authMiddleware;

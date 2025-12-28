@@ -1,7 +1,8 @@
-import { Appointment } from "../models/Appointment.model.js";
-import { User } from "../models/user.model.js";
-import { ApiError } from "../utils/ApiError.js";
-import { APPOINTMENT_STATUS, ROLES } from "../config/constants";
+import  Appointment  from "../models/Appointment.model.js";
+import  User  from "../models/user.model.js";
+import  ApiError  from "../utils/ApiError.js";
+import  {APPOINTMENT_STATUS}  from "../config/constants/appointmentStatus.js";
+import { ROLES } from "../config/constants/roles.js";
 
 class AppointmentService {
   static async createAppointment({ patientId, doctorId, date }, currentUser) {

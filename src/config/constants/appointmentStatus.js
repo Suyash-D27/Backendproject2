@@ -1,6 +1,8 @@
-export const APPOINTMENT_STATUS = Object.freeze({
+const APPOINTMENT_STATUS = Object.freeze({
   SCHEDULED: "SCHEDULED",
   IN_PROGRESS: "IN_PROGRESS",
   COMPLETED: "COMPLETED",
   CANCELLED: "CANCELLED",
 });
+
+export { APPOINTMENT_STATUS };
