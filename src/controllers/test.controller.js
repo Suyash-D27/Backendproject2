@@ -50,18 +50,23 @@ export const updateTestStatus = asyncHandler(async (req, res) => {
  * (Lab admin only – enforced in service)
  */
 export const uploadTestReport = asyncHandler(async (req, res) => {
-  validateObjectId(req.params.testId, "testId");
-  requireFields(req.body, ["reportUrl"]);
+  const file = req.file;  // ← multer gives the uploaded file
 
-  const test = await TestService.uploadTestReport({
+  if (!file) {
+    throw new ApiError(400, "Report file is required");
+  }
+
+  const reportUrl = await uploadToCloudinary(file.buffer, "test_reports");
+
+  const updated = await TestService.uploadTestReport({
     testId: req.params.testId,
-    reportUrl: req.body.reportUrl,
-    user: req.user
+    reportUrl,
+    user: req.user,
   });
 
   return res
     .status(200)
-    .json(new ApiResponse(200, test, "Test report uploaded"));
+    .json(new ApiResponse(200, updated, "Test report uploaded"));
 });
 
 /**

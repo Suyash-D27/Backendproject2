@@ -9,6 +9,7 @@ import healthRecordRoutes from "./routes/healthrecord.routes.js";
 import prescriptionRoutes from "./routes/prescription.routes.js";
 import testRoutes from "./routes/test.routes.js";
 import historyRoutes from "./routes/history.routes.js";
+import cookieParser from "cookie-parser";
 
 import{errorMiddleware}from "./middlewares/error.middleware.js";
 
@@ -25,7 +26,7 @@ app.use(cors({
 }));
 
 // Cookies
-// app.use(cookieParser());
+ app.use(cookieParser());
 
 // -----------------------------
 // 🔥 API ROUTES

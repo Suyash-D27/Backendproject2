@@ -5,6 +5,7 @@ import {
   validateEmail,
   validatePassword
 } from "../utils/validators.js";
+import { cookieOptions } from "../config/cookieOptions.js";
 
 import AuthService from "../services/auth.service.js";
 
@@ -29,19 +30,20 @@ export const register = asyncHandler(async (req, res) => {
 /**
  * Login user
  */
+
 export const login = asyncHandler(async (req, res) => {
-  // 1. Basic input validation
   requireFields(req.body, ["email", "password"]);
-  validateEmail(req.body.email);
 
-  // 2. Delegate to service
-  const result = await AuthService.loginUser(req.body);
+  const result = await AuthService.loginUser(req.body.email, req.body.password);
 
-  // 3. Response
+  // SET COOKIE HERE
+  res.cookie("token", result.token, cookieOptions);
+
   return res
     .status(200)
-    .json(new ApiResponse(200, result, "Login successful"));
+    .json(new ApiResponse(200, result.user, "Login successful"));
 });
+
 
 /**
  * Get current logged-in user

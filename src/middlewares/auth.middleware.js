@@ -1,39 +1,30 @@
 import jwt from "jsonwebtoken";
-import  ApiError  from "../utils/ApiError.js";
-import  User  from "../models/user.model.js";
+import ApiError from "../utils/ApiError.js";
 
-  const authMiddleware = async (req, _, next) => {
-  const token =
-    req.cookies?.accessToken ||
-    req.header("Authorization")?.replace("Bearer ", "");
-
-  if (!token) {
-    throw new ApiError(401, "Unauthorized request");
-  }
-
-  let decoded;
+const auth = (req, res, next) => {
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch {
-    throw new ApiError(401, "Invalid or expired token");
+    // Read token from cookie
+    const token = req.cookies.token;
+
+    if (!token) {
+      throw new ApiError(401, "Unauthorized: No token provided");
+    }
+
+    // Verify JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Attach user info to request
+    req.user = {
+      userId: decoded.userId,
+      role: decoded.role,
+      hospitalId: decoded.hospitalId || null,
+    };
+
+    next();
+  } catch (err) {
+    console.error("Auth Error:", err);
+    return next(new ApiError(401, "Unauthorized: Invalid or expired token"));
   }
-
-  const user = await User.findById(decoded.userId).select(
-    "_id role hospitalId"
-  );
-
-  if (!user) {
-    throw new ApiError(401, "User no longer exists");
-  }
-
-  // 🔑 Attach context for services
-  req.user = {
-    userId: user._id,
-    role: user.role,
-    hospitalId: user.hospitalId,
-  };
-
-  next();
 };
 
-export default authMiddleware;
+export default auth;
