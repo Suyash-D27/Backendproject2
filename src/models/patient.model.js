@@ -9,6 +9,8 @@ const patientSchema = new mongoose.Schema(
       unique: true
     },
 
+    aadhaarFileUrl: { type: String, default: null },
+
     age: {
       type: Number,
       required: true

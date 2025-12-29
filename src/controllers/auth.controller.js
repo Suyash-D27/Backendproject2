@@ -56,3 +56,19 @@ export const getMe = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, user, "User fetched successfully"));
 });
+
+export const uploadProfileImage = asyncHandler(async (req, res) => {
+  const file = req.file;
+  if (!file) throw new ApiError(400, "Profile image is required");
+
+  const uploaded = await uploadToCloudinary(file.buffer, "profile_images");
+
+  const updatedUser = await AuthService.updateProfileImage({
+    userId: req.user.userId,
+    profileImageUrl: uploaded.secure_url,
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedUser, "Profile photo updated"));
+});

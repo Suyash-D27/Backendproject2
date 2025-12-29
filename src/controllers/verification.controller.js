@@ -7,6 +7,7 @@ import {
 } from "../utils/validators.js";
 
 import VerificationService from "../services/verification.service.js";
+import uploadToCloudinary  from "../config/cloudinary.js";
 
 /**
  * Submit Aadhaar for patient verification
@@ -38,9 +39,16 @@ export const submitMedicalLicense = asyncHandler(async (req, res) => {
   requireFields(req.body, ["licenseNumber"]);
   validateMedicalLicense(req.body.licenseNumber);
 
+  const file = req.file;
+
+  if (!file) throw new ApiError(400, "License file is required");
+
+  const uploaded = await uploadToCloudinary(file.buffer, "license_docs");
+
   const result = await VerificationService.verifyDoctorLicense({
     userId: req.user.userId,
-    licenseNumber: req.body.licenseNumber
+    licenseNumber: req.body.licenseNumber,
+    licenseFileUrl: uploaded
   });
 
   return res

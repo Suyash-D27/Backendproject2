@@ -53,6 +53,9 @@ class VerificationService {
       throw new ApiError(404, "Doctor not found");
     }
 
+    
+
+
     // Hospital admin can verify only own hospital doctors
     if (
       currentUser.role === ROLES.HOSPITAL_ADMIN &&
@@ -80,6 +83,17 @@ class VerificationService {
       message: "Doctor license verified successfully",
     };
   }
+
+   static async submitLicense({ userId, licenseFileUrl }) {
+  const doctor = await Doctor.findOne({ userId });
+  if (!doctor) throw new Error("Doctor profile not found");
+
+  doctor.licenseFileUrl = licenseFileUrl;
+  await doctor.save();
+
+  return doctor;
+}
+
 
   // 3️⃣ Reject Verification (Patient / Doctor)
   static async rejectVerification(userId, reason, currentUser) {

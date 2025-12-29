@@ -106,6 +106,20 @@ class AuthService {
   async getCurrentUser(userId) {
     return await User.findById(userId).select("-password");
   }
+
+  // -------------------------------------------------------------
+  // 4️⃣ UPDATE PROFILE IMAGE
+  // -------------------------------------------------------------
+  async updateProfileImage({ userId, profileImageUrl }) {
+    const user = await User.findById(userId);
+    if (!user) throw new Error("User not found");
+
+    user.profileImageUrl = profileImageUrl;
+    await user.save();
+
+    return user;
+  }
 }
+
 
 export default new AuthService();
