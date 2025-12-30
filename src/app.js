@@ -10,7 +10,7 @@ import prescriptionRoutes from "./routes/prescription.routes.js";
 import testRoutes from "./routes/test.routes.js";
 import historyRoutes from "./routes/history.routes.js";
 import cookieParser from "cookie-parser";
-
+import publicRoutes from "./public.routes.js";
 import{errorMiddleware}from "./middlewares/error.middleware.js";
 
 const app = express();
@@ -38,6 +38,7 @@ app.use("/api/records", healthRecordRoutes);
 app.use("/api/prescriptions", prescriptionRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/history", historyRoutes);
+app.use("/api/public", publicRoutes);
 
 // -----------------------------
 // ❌ GLOBAL ERROR HANDLER (MUST BE LAST)
