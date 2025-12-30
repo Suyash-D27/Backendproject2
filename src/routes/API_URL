@@ -1,0 +1,33 @@
+Healthcare Management Backend - API Endpoints
+
+AUTH POST /api/auth/register POST /api/auth/login POST /api/auth/logout
+GET /api/auth/me
+
+USERS GET /api/users/ GET /api/users/:id PATCH /api/users/:id DELETE
+/api/users/:id
+
+DOCTORS POST /api/doctors/create GET /api/doctors/ GET /api/doctors/:id
+PATCH /api/doctors/:id PATCH /api/doctors/:id/approve DELETE
+/api/doctors/:id
+
+PATIENTS POST /api/patients/create GET /api/patients/ GET
+/api/patients/:id PATCH /api/patients/:id DELETE /api/patients/:id
+
+APPOINTMENTS POST /api/appointments/create GET /api/appointments/ GET
+/api/appointments/:id PATCH /api/appointments/:id DELETE
+/api/appointments/:id PATCH /api/appointments/:id/status
+
+HEALTH RECORDS POST /api/records/create GET /api/records/ GET
+/api/records/:id PATCH /api/records/:id DELETE /api/records/:id
+
+PRESCRIPTIONS POST /api/prescriptions/create GET /api/prescriptions/ GET
+/api/prescriptions/:id PATCH /api/prescriptions/:id DELETE
+/api/prescriptions/:id
+
+TESTS POST /api/tests/create GET /api/tests/ GET /api/tests/:id PATCH
+/api/tests/:id DELETE /api/tests/:id POST /api/tests/:id/upload-report
+
+UPLOADS POST /api/uploads/profile POST /api/uploads/aadhaar POST
+/api/uploads/license POST /api/uploads/test-report
+
+AUDIT LOGS GET /api/audits/ GET /api/audits/:id
