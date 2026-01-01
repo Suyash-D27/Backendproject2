@@ -12,7 +12,7 @@ router.use(authMiddleware);
 
 router.post(
     "/create",
-    requireRole(ROLES.SUPER_ADMIN),
+    // requireRole(ROLES.SUPER_ADMIN), // TODO: Enable this for production
     createHospital
 );
 
