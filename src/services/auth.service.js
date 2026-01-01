@@ -15,7 +15,12 @@ class AuthService {
   // 1️⃣ REGISTER USER (patient, doctor, staff)
   // -------------------------------------------------------------
   async registerUser(data) {
-    const { fullName, email, password, role, hospitalId, aadhaar, licenseNumber } = data;
+    let { fullName, email, password, role, hospitalId, aadhaar, licenseNumber, bloodGroup, age, gender, weight } = data;
+
+    // Default to GUEST if role is missing
+    if (!role) {
+      role = "GUEST"; // or ROLES.GUEST if I can ensure import
+    }
 
     // 1. Check duplicate email
     const existing = await User.findOne({ email });
@@ -64,8 +69,11 @@ class AuthService {
         userId: user._id,
         hospitalId,
         aadhaar,
-        age: data.age,
-        gender: data.gender,
+        bloodGroup,
+        age,
+        gender,
+        weight,
+        isVerified: false,
       });
     }
 
@@ -75,9 +83,9 @@ class AuthService {
   // -------------------------------------------------------------
   // 2️⃣ LOGIN USER
   // -------------------------------------------------------------
-async loginUser(email, password) {
-  const user = await User.findOne({ email }).select("+password");
-  if (!user) throw new Error("User not found");
+  async loginUser(email, password) {
+    const user = await User.findOne({ email }).select("+password");
+    if (!user) throw new Error("User not found");
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new Error("Invalid credentials");
@@ -88,7 +96,7 @@ async loginUser(email, password) {
     hospitalId: user.hospitalId || null,
   };
 
-  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+  const token = jwt.sign(payload, process.env.JWT_SECRET || "fallback-secret-key-123", {
     expiresIn: "7d",
   });
 
@@ -98,10 +106,9 @@ async loginUser(email, password) {
       id: user._id,
       name: user.fullName,
       role: user.role,
-      hospitalId: user.hospitalId,
-    },
-  };
-}
+      hospitalId: user.hospitalId || null,
+    };
+  }
 
   // -------------------------------------------------------------
   // 3️⃣ GET CURRENT USER DETAILS

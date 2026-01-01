@@ -23,8 +23,8 @@
 
       role: {
         type: String,
-        enum: ["PATIENT", "DOCTOR", "LAB_ADMIN", "HOSPITAL_ADMIN", "SUPER_ADMIN","DR_Reception"],
-        required: true
+        enum: ["GUEST", "PATIENT", "DOCTOR", "LAB_ADMIN", "HOSPITAL_ADMIN", "SUPER_ADMIN", "DR_Reception"],
+        default: "GUEST"
       },
 
       aadhaar: {
