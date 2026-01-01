@@ -3,15 +3,15 @@ import ApiError from "../utils/ApiError.js";
 
 const auth = (req, res, next) => {
   try {
-    // Read token from cookie
-    const token = req.cookies.token;
+    // Read token from cookie OR Authorization header
+    const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(" ")[1]);
 
     if (!token) {
       throw new ApiError(401, "Unauthorized: No token provided");
     }
 
     // Verify JWT
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback-secret-key-123");
 
     // Attach user info to request
     req.user = {

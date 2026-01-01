@@ -1,4 +1,4 @@
-import  ApiError  from "../utils/ApiError.js";
+import ApiError from "../utils/ApiError.js";
 
 export const errorMiddleware = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
@@ -13,6 +13,7 @@ export const errorMiddleware = (err, req, res, next) => {
   res.status(statusCode).json({
     success: false,
     message,
+    stack: err.stack
   });
 };
 

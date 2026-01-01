@@ -14,7 +14,7 @@ import AuthService from "../services/auth.service.js";
  */
 export const register = asyncHandler(async (req, res) => {
   // 1. Basic input validation
-  requireFields(req.body, ["email", "password", "role"]);
+  requireFields(req.body, ["email", "password"]);
   validateEmail(req.body.email);
   validatePassword(req.body.password);
 
@@ -41,7 +41,7 @@ export const login = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, result.user, "Login successful"));
+    .json(new ApiResponse(200, { user: result.user, token: result.token }, "Login successful"));
 });
 
 
