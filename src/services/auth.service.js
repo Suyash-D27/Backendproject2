@@ -15,7 +15,7 @@ class AuthService {
   // 1️⃣ REGISTER USER (patient, doctor, staff)
   // -------------------------------------------------------------
   async registerUser(data) {
-    const { name, email, password, role, hospitalId, aadhaar, licenseNumber } = data;
+    const { fullName, email, password, role, hospitalId, aadhaar, licenseNumber } = data;
 
     // 1. Check duplicate email
     const existing = await User.findOne({ email });
@@ -34,11 +34,13 @@ class AuthService {
 
     if (role === ROLES.PATIENT) {
       if (!aadhaar) throw new Error("Patient must provide Aadhaar number");
+      if(!data.age) throw new Error("Patient must provide age");
+      if(!data.gender) throw new Error("Patient must provide gender");  
     }
 
     // 4. Create user
     const user = await User.create({
-      name,
+      fullName,
       email,
       password: hashed,
       role,
@@ -62,6 +64,8 @@ class AuthService {
         userId: user._id,
         hospitalId,
         aadhaar,
+        age: data.age,
+        gender: data.gender,
       });
     }
 
@@ -71,34 +75,33 @@ class AuthService {
   // -------------------------------------------------------------
   // 2️⃣ LOGIN USER
   // -------------------------------------------------------------
-  async loginUser(email, password) {
-    const user = await User.findOne({ email });
-    if (!user) throw new Error("User not found");
+async loginUser(email, password) {
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) throw new Error("User not found");
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) throw new Error("Invalid credentials");
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) throw new Error("Invalid credentials");
 
-    // JWT payload
-    const payload = {
-      userId: user._id,
+  const payload = {
+    userId: user._id,
+    role: user.role,
+    hospitalId: user.hospitalId || null,
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
+
+  return {
+    token,
+    user: {
+      id: user._id,
+      name: user.fullName,
       role: user.role,
-      hospitalId: user.hospitalId || null,
-    };
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
-
-    return {
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        role: user.role,
-        hospitalId: user.hospitalId,
-      },
-    };
-  }
+      hospitalId: user.hospitalId,
+    },
+  };
+}
 
   // -------------------------------------------------------------
   // 3️⃣ GET CURRENT USER DETAILS

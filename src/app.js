@@ -10,7 +10,7 @@ import prescriptionRoutes from "./routes/prescription.routes.js";
 import testRoutes from "./routes/test.routes.js";
 import historyRoutes from "./routes/history.routes.js";
 import cookieParser from "cookie-parser";
-import publicRoutes from "./public.routes.js";
+import publicRoutes from "./routes/public.routes.js";
 import{errorMiddleware}from "./middlewares/error.middleware.js";
 
 const app = express();
