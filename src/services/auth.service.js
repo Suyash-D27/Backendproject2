@@ -14,63 +14,66 @@ class AuthService {
   // -------------------------------------------------------------
   // 1️⃣ REGISTER USER (patient, doctor, staff)
   // -------------------------------------------------------------
+  // -------------------------------------------------------------
+  // 1️⃣ REGISTER USER (patient, doctor, staff)
+  // -------------------------------------------------------------
   async registerUser(data) {
-    let { fullName, email, password, role, hospitalId, aadhaar, licenseNumber, bloodGroup, age, gender, weight } = data;
+    let { fullName, email, phone, password, role, hospitalId, aadhaar, licenseNumber, bloodGroup, age, gender, weight } = data;
 
     // Default to GUEST if role is missing
     if (!role) {
       role = "GUEST"; // or ROLES.GUEST if I can ensure import
     }
 
-    // 1. Check duplicate email
-    const existing = await User.findOne({ email });
-    if (existing) throw new Error("Email already in use");
+    // 1. Validate Identifier (Email OR Phone)
+    if (!email && !phone) {
+      throw new Error("Either Email or Phone is required");
+    }
 
-    // 2. Hash password
+    // 2. Check duplicates
+    if (email) {
+      const existingEmail = await User.findOne({ email });
+      if (existingEmail) throw new Error("Email already in use");
+    }
+    if (phone) {
+      const existingPhone = await User.findOne({ phone });
+      if (existingPhone) throw new Error("Phone already in use");
+    }
+
+    // 4. Hash password
     const hashed = await bcrypt.hash(password, 10);
 
-    // 3. Validate role creation logic
-    if (role === ROLES.DOCTOR) {
-      if (!licenseNumber) throw new Error("Doctor must provide licenseNumber");
-
-      // Doctor must be linked to a hospital
-      if (!hospitalId) throw new Error("Doctor must belong to a hospital");
-    }
-
-    if (role === ROLES.PATIENT) {
-      if (!aadhaar) throw new Error("Patient must provide Aadhaar number");
-    }
-
-    // 4. Create user
+    // 5. Create user
     const user = await User.create({
       fullName,
       email,
+      phone,
+      // uniqueId: Generated ONLY after first appointment (Role Upgrade)
       password: hashed,
       role,
       hospitalId: hospitalId || null,
-      isVerified: false,   // Admin verifies doctors separately
+      isVerified: false,
     });
 
-    // 5. Create role-specific profiles
+    // 6. Role Profile Creation (Doctor/Patient logic...)
     if (role === ROLES.DOCTOR) {
+      if (!licenseNumber || !hospitalId) throw new Error("Doctor details incomplete");
       await Doctor.create({
         userId: user._id,
         hospitalId,
         licenseNumber,
         specialization: data.specialization,
-        isApproved: false,  // Approved by Hospital Admin
+        isApproved: false,
       });
     }
 
     if (role === ROLES.PATIENT) {
+      // Logic for pre-declared PATIENT role signup? Usually uncommon if upgrading from GUEST, but supported.
       await Patient.create({
         userId: user._id,
         hospitalId,
         aadhaar,
-        bloodGroup,
-        age,
-        gender,
-        weight,
+        bloodGroup, age, gender, weight,
         isVerified: false,
       });
     }
@@ -81,18 +84,50 @@ class AuthService {
   // -------------------------------------------------------------
   // 2️⃣ LOGIN USER
   // -------------------------------------------------------------
-  async loginUser(email, password) {
-    const user = await User.findOne({ email }).select("+password");
-    if (!user) throw new Error("User not found");
+  // -------------------------------------------------------------
+  // 2️⃣ LOGIN USER OR PATIENT
+  // -------------------------------------------------------------
+  async loginUser(identifier, password) {
+    // A. TRY LOGIN AS USER (Email/Phone)
+    const user = await User.findOne({
+      $or: [
+        { email: identifier },
+        { phone: identifier },
+        // { uniqueId: identifier } // Removed User uniqueId login preference if needed, or keep for legacy
+      ]
+    }).select("+password");
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) throw new Error("Invalid credentials");
+    if (user) {
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        return this.generateTokenResponse(user, ROLES.USER); // Or user.role
+      }
+    }
 
-    // JWT payload
+    // B. TRY LOGIN AS PATIENT (patientUid)
+    // Identifier must look like 'pat-...' or just match patientUid
+    const patient = await Patient.findOne({ patientUid: identifier }).select("+password");
+
+    if (patient) {
+      const match = await bcrypt.compare(password, patient.password);
+      if (match) {
+        // Patient Login Successful
+        // Note: Patients might NOT be Users. Token payload reflects this.
+        return this.generateTokenResponse(patient, ROLES.PATIENT, true);
+      }
+    }
+
+    throw new Error("Invalid credentials");
+  }
+
+  // Helper to generate token
+  generateTokenResponse(entity, role, isPatientEntity = false) {
     const payload = {
-      userId: user._id,
-      role: user.role,
-      hospitalId: user.hospitalId || null,
+      userId: isPatientEntity ? null : entity._id, // Null for pure patients
+      patientId: isPatientEntity ? entity._id : null,
+      role: isPatientEntity ? ROLES.PATIENT : entity.role,
+      hospitalId: entity.hospitalId || null,
+      isPatientLogin: isPatientEntity
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET || "fallback-secret-key-123", {
@@ -102,11 +137,13 @@ class AuthService {
     return {
       token,
       user: {
-        id: user._id,
-        name: user.name,
-        role: user.role,
-        hospitalId: user.hospitalId,
-      },
+        id: entity._id,
+        name: entity.fullName || entity.name, // User has fullName, Patient has name
+        email: entity.email,
+        phone: entity.phone,
+        role: payload.role,
+        patientUid: entity.patientUid || undefined
+      }
     };
   }
 

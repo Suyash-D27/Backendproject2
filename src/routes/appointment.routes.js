@@ -11,7 +11,7 @@ import hospitalScope from "../middlewares/hospitalScope.middleware.js";
 
 const router = express.Router();
 
-router.post("/", auth, verified, hospitalScope, createAppointment);
+router.post("/", auth, createAppointment);
 router.patch("/:appointmentId/status", auth, verified, hospitalScope, updateAppointmentStatus);
 router.get("/", auth, verified, hospitalScope, getAppointments);
 

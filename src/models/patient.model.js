@@ -15,6 +15,18 @@ const patientSchema = new mongoose.Schema(
       required: true
     },
 
+    // Validated Identity Fields
+    name: { type: String, trim: true, required: true },
+    dob: { type: Date, required: true },
+    aadhaar: { type: String, trim: true, sparse: true, unique: true, required: true },
+
+    // Patient Access
+    patientUid: { type: String, unique: true, required: true, trim: true, lowercase: true },
+    password: { type: String, required: true, select: false },
+
+    email: { type: String, trim: true, sparse: true },
+    phone: { type: String, trim: true, sparse: true },
+
     gender: {
       type: String,
       enum: ["Male", "Female", "Other"],
@@ -23,7 +35,8 @@ const patientSchema = new mongoose.Schema(
 
     bloodGroup: {
       type: String,
-      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
+      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      required: true
     },
 
     weight: {
