@@ -60,7 +60,16 @@ export const login = asyncHandler(async (req, res) => {
  */
 export const getMe = asyncHandler(async (req, res) => {
   // req.user is injected by auth middleware
-  const user = await AuthService.getCurrentUser(req.user.userId);
+  console.log("DEBUG: getMe req.user:", req.user);
+
+  let user;
+  if (req.user.isPatientLogin) {
+    user = await AuthService.getCurrentPatient(req.user.patientId);
+  } else {
+    user = await AuthService.getCurrentUser(req.user.userId);
+  }
+
+  console.log("DEBUG: getMe fetched entity:", user);
 
   return res
     .status(200)

@@ -1,4 +1,4 @@
-import Appointment from "../models/Appointment.model.js";
+import Appointment from "../models/appointment.model.js";
 import User from "../models/user.model.js";
 import Patient from "../models/patient.model.js";
 import ApiError from "../utils/ApiError.js";
@@ -113,6 +113,23 @@ class AppointmentService {
     return appointment;
   }
 
+  // Unified method called by Controller
+  static async updateAppointmentStatus({ appointmentId, status, user }) {
+    switch (status) {
+      case APPOINTMENT_STATUS.IN_PROGRESS:
+        return await this.startAppointment(appointmentId, user);
+
+      case APPOINTMENT_STATUS.COMPLETED:
+        return await this.completeAppointment(appointmentId, user);
+
+      case APPOINTMENT_STATUS.CANCELLED:
+        return await this.cancelAppointment(appointmentId, user);
+
+      default:
+        throw new ApiError(400, "Invalid status update");
+    }
+  }
+
   // Start Appointment 
 
 
@@ -188,6 +205,53 @@ class AppointmentService {
 
     return appointment;
   }
+  static async getAppointments({ user, page = 1, limit = 10 }) {
+    const skip = (page - 1) * limit;
+    const query = {};
+
+    // 1. If Patient (Login as Patient Entity or User with PATIENT role)
+    if (user.isPatientLogin || user.role === ROLES.PATIENT) {
+      if (user.patientId) {
+        query.patientId = user.patientId;
+      } else {
+        // Fallback: If User is PATIENT but no patientId in token (legacy?), find patient by userId
+        const patient = await Patient.findOne({ userId: user.userId });
+        if (patient) query.patientId = patient._id;
+        else return []; // No patient record found
+      }
+    }
+    // 2. If Doctor
+    else if (user.role === ROLES.DOCTOR) {
+      query.doctorId = user.userId;
+      if (user.hospitalId) query.hospitalId = user.hospitalId;
+    }
+    // 3. If Admin/Reception
+    else if ([ROLES.ADMIN, ROLES.HOSPITAL_ADMIN, ROLES.RECEPTION].includes(user.role)) {
+      if (user.hospitalId) query.hospitalId = user.hospitalId;
+    }
+    else {
+      // Guest or unknown? Return empty or throw generic
+      return [];
+    }
+
+    const appointments = await Appointment.find(query)
+      .populate("patientId", "name age gender bloodGroup")
+      .populate("doctorId", "fullName specialization")
+      .populate("hospitalId", "name address")
+      .sort({ appointmentDate: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Appointment.countDocuments(query);
+
+    return {
+      appointments,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+      totalAppointments: total
+    };
+  }
+
   static async getDoctorAppointments(currentUser) {
     if (currentUser.role !== ROLES.DOCTOR) {
       throw new ApiError(403, "Doctor access only");

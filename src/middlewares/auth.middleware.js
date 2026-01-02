@@ -18,6 +18,8 @@ const auth = (req, res, next) => {
       userId: decoded.userId,
       role: decoded.role,
       hospitalId: decoded.hospitalId || null,
+      patientId: decoded.patientId || null,
+      isPatientLogin: decoded.isPatientLogin || false,
     };
 
     next();

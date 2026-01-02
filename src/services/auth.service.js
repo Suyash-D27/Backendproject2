@@ -122,13 +122,15 @@ class AuthService {
 
   // Helper to generate token
   generateTokenResponse(entity, role, isPatientEntity = false) {
+    // console.log("DEBUG: generateToken token gen for:", entity._id, "Role:", role, "isPatient:", isPatientEntity);
     const payload = {
-      userId: isPatientEntity ? null : entity._id, // Null for pure patients
+      userId: isPatientEntity ? (entity.userId || null) : entity._id,
       patientId: isPatientEntity ? entity._id : null,
       role: isPatientEntity ? ROLES.PATIENT : entity.role,
       hospitalId: entity.hospitalId || null,
       isPatientLogin: isPatientEntity
     };
+    // console.log("DEBUG: generateToken payload:", payload);
 
     const token = jwt.sign(payload, process.env.JWT_SECRET || "fallback-secret-key-123", {
       expiresIn: "7d",
@@ -152,6 +154,10 @@ class AuthService {
   // -------------------------------------------------------------
   async getCurrentUser(userId) {
     return await User.findById(userId).select("-password");
+  }
+
+  async getCurrentPatient(patientId) {
+    return await Patient.findById(patientId).select("-password");
   }
 }
 
