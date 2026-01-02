@@ -3,6 +3,7 @@ dotenv.config();
 
 import mongoose from "mongoose";
 import app from "./app.js";
+import bootstrapSuperAdmin from "./config/bootstrapSuperAdmin.js";
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
@@ -14,8 +15,12 @@ if (!MONGO_URI) {
 
 mongoose
     .connect(MONGO_URI)
-    .then(() => {
+    .then(async () => {
         console.log("✅ MongoDB Connected");
+
+        // Run bootstrap after connection
+        await bootstrapSuperAdmin();
+
         app.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
         });

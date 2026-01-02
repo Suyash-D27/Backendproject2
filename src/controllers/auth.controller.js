@@ -12,11 +12,17 @@ import AuthService from "../services/auth.service.js";
 /**
  * Register user (Patient / Doctor / Admin)
  */
+// -----------------------------------------------------------------------------
 export const register = asyncHandler(async (req, res) => {
   // 1. Basic input validation
-  requireFields(req.body, ["email", "password"]);
-  validateEmail(req.body.email);
-  validatePassword(req.body.password);
+  const { email, phone, password } = req.body;
+
+  if (!email && !phone) {
+    throw new ApiError(400, "Email or Phone is required");
+  }
+  if (!password) {
+    throw new ApiError(400, "Password is required");
+  }
 
   // 2. Delegate to service
   const user = await AuthService.registerUser(req.body);
@@ -27,14 +33,18 @@ export const register = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, user, "User registered successfully"));
 });
 
-/**
- * Login user
- */
-
+// -----------------------------------------------------------------------------
 export const login = asyncHandler(async (req, res) => {
-  requireFields(req.body, ["email", "password"]);
+  const { identifier, email, phone, password } = req.body;
 
-  const result = await AuthService.loginUser(req.body.email, req.body.password);
+  // Allow user to send "email" or "phone" or "identifier" field
+  const loginId = identifier || email || phone;
+
+  if (!loginId || !password) {
+    throw new ApiError(400, "Identifier (Email/Phone/ID) and Password required");
+  }
+
+  const result = await AuthService.loginUser(loginId, password);
 
   // SET COOKIE HERE
   res.cookie("token", result.token, cookieOptions);

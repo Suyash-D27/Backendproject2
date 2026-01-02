@@ -13,16 +13,15 @@ import AppointmentService from "../services/appointment.service.js";
  * (Patient / Reception)
  */
 export const createAppointment = asyncHandler(async (req, res) => {
-  requireFields(req.body, ["patientId", "doctorId", "appointmentDate"]);
+  requireFields(req.body, ["doctorId", "appointmentDate", "bookingType"]);
+  // patientId and patientDetails are conditional based on bookingType
 
-  validateObjectId(req.body.patientId, "patientId");
   validateObjectId(req.body.doctorId, "doctorId");
+  if (req.body.patientId) validateObjectId(req.body.patientId, "patientId");
 
   const appointment = await AppointmentService.createAppointment({
-    ...req.body,
-    createdBy: req.user.userId,
-    hospitalId: req.user.hospitalId
-  });
+    ...req.body
+  }, req.user); // Pass full user object as currentUser
 
   return res
     .status(201)

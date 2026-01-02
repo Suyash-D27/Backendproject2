@@ -9,9 +9,11 @@ import healthRecordRoutes from "./routes/healthrecord.routes.js";
 import prescriptionRoutes from "./routes/prescription.routes.js";
 import testRoutes from "./routes/test.routes.js";
 import historyRoutes from "./routes/history.routes.js";
-import cookieParser from "cookie-parser";
 import publicRoutes from "./routes/public.routes.js";
-import{errorMiddleware}from "./middlewares/error.middleware.js";
+import hospitalRoutes from "./routes/hospital.routes.js";
+import cookieParser from "cookie-parser";
+
+import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 const app = express();
 
@@ -26,7 +28,7 @@ app.use(cors({
 }));
 
 // Cookies
- app.use(cookieParser());
+app.use(cookieParser());
 
 // -----------------------------
 // 🔥 API ROUTES
@@ -39,6 +41,7 @@ app.use("/api/prescriptions", prescriptionRoutes);
 app.use("/api/tests", testRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/public", publicRoutes);
+app.use("/api/hospitals", hospitalRoutes);
 
 // -----------------------------
 // ❌ GLOBAL ERROR HANDLER (MUST BE LAST)
