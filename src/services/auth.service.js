@@ -16,7 +16,7 @@ class AuthService {
   // 1️⃣ REGISTER USER (patient, doctor, staff)
   // -------------------------------------------------------------
   async registerUser(data) {
-    let { fullName, email, phone, password, role, hospitalId, aadhaar, licenseNumber, bloodGroup, age, gender, weight } = data;
+    let { fullName, email, phone, password, role, hospitalId, aadhaar, licenseNumber, bloodGroup, age, gender, weight, dob } = data;
 
     // Default to guest role if missing
     if (!role) role = "GUEST";
@@ -64,12 +64,18 @@ class AuthService {
     }
 
     if (role === ROLES.PATIENT) {
-      // Logic for pre-declared PATIENT role signup? Usually uncommon if upgrading from GUEST, but supported.
+      // Basic patientUid generator: PAT-<TIMESTAMP>-<RANDOM>
+      const patientUid = `PAT-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
       await Patient.create({
         userId: user._id,
         hospitalId,
         aadhaar,
         bloodGroup, age, gender, weight,
+        dob: dob || new Date(), // Fallback if not provided, but ideally should be required
+        name: fullName,       // Patient model needs 'name'
+        patientUid,           // Required unique ID
+        password: hashed,     // Required for Patient login
         isVerified: false,
       });
     }

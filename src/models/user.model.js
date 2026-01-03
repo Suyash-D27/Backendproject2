@@ -53,7 +53,7 @@
         default: false
       },
 
-      profileImageUrl: { type: String, default: null },
+    profileImageUrl: { type: String, default: null },
 
       isActive: {
         type: Boolean,
