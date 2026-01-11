@@ -69,7 +69,7 @@ export const getMe = asyncHandler(async (req, res) => {
     user = await AuthService.getCurrentUser(req.user.userId);
   }
 
-  console.log("DEBUG: getMe fetched entity:", user);
+  // console.log("DEBUG: getMe fetched entity:", user);
 
   return res
     .status(200)
