@@ -92,7 +92,7 @@ The API is structured around the following resource paths (prefixed with `/api`)
 
 ## 📚 API Documentation
 
-You can explore and test the API endpoints using our Postman Collection:
+You can explore and test the API endpoints using my Postman Collection:
 
 [**View Postman Collection**](https://yashdaharwal27-958246.postman.co/workspace/Suyash-Daharwal's-Workspace~c913dfc1-8583-4551-8d33-582d5aee05cb/collection/50136839-2ad0397e-2cba-4fb7-9a3b-7a8569efe625?action=share&creator=50136839&active-environment=50136839-56800efe-6c0d-452d-bed0-ddfe030acc0a)
 
